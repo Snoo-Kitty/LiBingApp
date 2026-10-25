@@ -35,8 +35,7 @@ export default class Autoresponder {
 					case RespondType.RESPOND_URL:
 						const url = message.content.split(` `).find((s) => s.startsWith(`https://`))
 						if (!url) break
-						message.react(`⏳`)
-						const embedded = new EmbeddedUrl(url).url
+						const embedded = new EmbeddedUrl(url).url.replace(`www.`, '')
 						await message.delete()
 						await (message.channel as TextChannel).send(`${message.author.displayName} sent \`${url}\`\n${embedded}`)
 						break
@@ -78,6 +77,7 @@ class EmbeddedUrl {
 		"x.com": "fixvx.com",
 		"reddit.com": "vxreddit.com",
 		"vm.tiktok.com": "d.tnktok.com",
+		"vt.tiktok.com": "d.tnktok.com",
 	}
 
 	constructor(originalUrl: string) {
@@ -87,6 +87,6 @@ class EmbeddedUrl {
 		} else {
 			this.url = originalUrl.replace(key, this.URLReplacements[key as keyof typeof this.URLReplacements])
 		}
-		this.logger.log(`Embedded ${originalUrl}`)
+		this.logger.log(`Embedded ${originalUrl} to ${this.url}`)
 	}
 }
