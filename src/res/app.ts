@@ -6,7 +6,7 @@ import Logger from "../util/log"
 import app from ".."
 
 export default class AppResources {
-	private static readonly directory: string = `resources/app/`
+	private static readonly directory: string = `resources/app/data/`
 	private static readonly templates: string = `src/res/template`
 	private static readonly logger: Logger = new Logger(`APPRESOURCE`)
 	private static readonly definedDataFile: string[] = ["autorespond", "servercfg"]

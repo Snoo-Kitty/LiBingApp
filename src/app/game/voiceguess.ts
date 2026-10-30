@@ -31,7 +31,7 @@ export default class VoiceGuessGame {
 	public async start(msg: Message) {
 		const embed = new EmbedBuilder()
 			.setTitle(`Guess the voiceline:`)
-			.setDescription(this.guessLine)
+			.setDescription(this.guessLine.length > 4096 ? this.guessLine.slice(0, 4093) + `...` : this.guessLine)
 			.setFooter({text: `Length Difficulty: ${this.difficulty.toFixed(2)}%`})
 			.setColor(`#3489eb`)
 		const authorId = await ButtonHandler.addButtonCache(`guess`, msg.author, false)
@@ -49,7 +49,7 @@ export default class VoiceGuessGame {
 		this.timeout = setTimeout(
 			async () => {
 				if (this.initial) {
-					await this.initial.edit({content: `Time's up! The answer was **${this.character}**.`, components: []})
+					await this.initial.edit({content: `Time's up! The answer was **${this.character}: ${this.lineAbout}**.`, components: []})
 				}
 				this.end()
 			},
@@ -57,7 +57,7 @@ export default class VoiceGuessGame {
 		)
 	}
 
-	public end() {
+	public end() {	
 		if (this.timeout) clearTimeout(this.timeout)
 		const vggcommandclass = CommandHandler.commandList.find((s) => s.command === `Voiceline guessr`)!
 		const index = vggcommandclass.onGoingGames.indexOf(this)
@@ -67,7 +67,9 @@ export default class VoiceGuessGame {
 	public async guess(guesser: User, character: string) {
 		if (this.ended) return false
 		this.guessList.push(`${guesser.displayName} guessed **${character}**`)
-		if (character.trim().toLowerCase() !== this.character.trim().toLowerCase()) return false
+		const clean = character.trim().toLowerCase()
+		const [first, last] = this.character.trim().toLowerCase().split(' ')
+		if (clean !== this.character.trim().toLowerCase() && clean !== first && clean !== last) return false
 		this.ended = true
 		void (async () => {
 			const user = (await UserData.get(guesser.id)) ?? {}
@@ -78,7 +80,7 @@ export default class VoiceGuessGame {
 			const embed = new EmbedBuilder()
 				.setColor(`#3489eb`)
 				.setTitle(`MATCH RESULT / There were ${this.guessList.length} guesses!`)
-				.addFields({name: `Line`, value: this.guessLine, inline: true}, {name: `Character`, value: this.character, inline: true})
+				.addFields({name: this.lineAbout, value: this.guessLine.length > 1024 ? this.guessLine.slice(0, 1021) + `...` : this.guessLine, inline: true}, {name: `Character`, value: this.character, inline: true})
 				.setFooter({text: `Length Difficulty: ${this.difficulty.toFixed(2)}`})
 				.setDescription(this.guessList.join("\n"))
 			this.initial!.channel.send({
