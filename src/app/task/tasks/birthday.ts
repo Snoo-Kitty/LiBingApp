@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs"
+import {existsSync, readFileSync} from "node:fs"
 import app from "../../.."
 import BotApplication from "../../../object/client"
 import AppResources from "../../../res/app"
@@ -31,8 +31,10 @@ export default class BirthdayTask {
 		const servers: ServerConfig = await AppResources.get(`servercfg`)
 		for (const [i, v] of Object.entries(servers)) {
 			let birthdayData = v.birthdays
-			const globalBirthdays = readFileSync('resources/app/birthday.json', 'utf-8')
-			if (globalBirthdays) birthdayData = birthdayData.concat(JSON.parse(globalBirthdays))
+			if (existsSync("resources/app/birthday.json")) {
+				const globalBirthdays = readFileSync("resources/app/birthday.json", "utf-8")
+				birthdayData = birthdayData.concat(JSON.parse(globalBirthdays))
+			}
 			const birthdays = birthdayData.filter((s) => s.date === dateKey)
 			birthdays.forEach((s) => {
 				this.announce(`Happy birthday to ${s.name}!`, v.chnl_birthday_annc)

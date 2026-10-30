@@ -1,6 +1,7 @@
 export interface UserItem {
     HoyoLabAuthToken?: string,
-    HoyoLabAccountId?: string
+    HoyoLabAccountId?: string,
+    VGGWins?: number
 }
 
 export interface UserData {

@@ -12,7 +12,7 @@ import app from "../.."
 
 export default class CommandHandler {
 	public static readonly logger: Logger = new Logger(`CMD`)
-	public static commandList: CommandInfo[] = []
+	public static commandList: any[] = []
 
 	public static async event(message: Message) {
 		const isItCmd = message.content.startsWith(app.PREFIX)
@@ -20,7 +20,7 @@ export default class CommandHandler {
 		const args = message.content.split(` `)
 		if (args.length < 1) return this.logger.warn(`For some reason it was a command but it has nothing at all`)
 		this.commandList.forEach(async (s) => {
-			if (s.triggers.find((trigger) => trigger === args[0]!.replace(`-`, ``))) {
+			if (s.triggers.find((trigger: string) => trigger === args[0]!.replace(app.PREFIX, ``))) {
 				this.logger.log(`${message.author.username} used ${s.command}: ${args.join(" -")}`)
 
 				if (s.wlrequire && !app.DEVELOPMENTWL.includes(message.author.id)) {
@@ -44,7 +44,7 @@ export default class CommandHandler {
 					return
 				}
 
-				await s.func(message, args.slice(1))
+				await s.run(message, args.slice(1))
 				return
 			}
 		})
@@ -54,21 +54,13 @@ export default class CommandHandler {
 		this.logger.log("Starting command handler...")
 		const handlers = path.join(__dirname, "commands")
 		const require = createRequire(__filename)
-		const commands = readdirSync(handlers).filter((s) => /\.(ts|js)$/.test(s) && !s.endsWith(".d.ts"))
+		const commands = readdirSync(handlers).filter((s) => (s.endsWith(".ts") || s.endsWith(".js")) && !s.endsWith(".d.ts"))
 
 		for (const command of commands) {
 			const loaded = require(path.join(handlers, command))
 			const cmdcl = loaded.default
 			if (cmdcl && typeof cmdcl.run === "function") {
-				this.commandList.push({
-					command: cmdcl.command,
-					description: cmdcl.description,
-					wlrequire: cmdcl.wlrequire,
-					usage: cmdcl.usage.replace(`<PRE>`, app.PREFIX),
-					triggers: cmdcl.triggers,
-					minimumArgs: cmdcl.minimumArgs,
-					func: cmdcl.run,
-				})
+				this.commandList.push(cmdcl)
 				this.logger.log(`Registered ${command}`)
 			} else {
 				this.logger.err(`${command} has no run function.`)

@@ -1,5 +1,4 @@
 import {ActionRowBuilder, ButtonBuilder, ButtonStyle, Message, MessagePayload, PermissionFlagsBits, User} from "discord.js"
-import {randomUUID} from "node:crypto"
 import ButtonHandler from "../../button"
 import UserData from "../../../res/user"
 import axios from "axios"
@@ -36,9 +35,9 @@ class HoyoLabActions {
 	}
 
 	public static async link(author: User, args: string[]): Promise<ButtonBuilder> {
-		const uuid = await ButtonHandler.addButtonCache(`link`, author)
+		const authorId = await ButtonHandler.addButtonCache(`link`, author)
 		const button: ButtonBuilder = new ButtonBuilder()
-			.setCustomId(Buffer.from(`link_${uuid}`, "utf-8").toBase64())
+			.setCustomId(Buffer.from(`link_${authorId}`, "utf-8").toString('base64'))
 			.setStyle(ButtonStyle.Primary)
 			.setLabel(`Link HoyoLab Account`)
 		return button

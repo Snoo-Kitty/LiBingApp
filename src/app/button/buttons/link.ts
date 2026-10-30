@@ -4,16 +4,16 @@ import ModalHandler from "../../modal"
 export default class HYLAccountLink {
 
     public readonly id: string
-    public readonly uuid: string
+    public readonly authorId: string
 
-    constructor(id: string, uuid: string) {
+    constructor(id: string, authorId: string) {
         this.id = id,
-        this.uuid = uuid
+        this.authorId = authorId
     }
 
     public async manage(interaction: ButtonInteraction, ...args: string[]) {
         const modal = new ModalBuilder().setTitle(`Link your HoyoLab Account`)
-        .setCustomId(Buffer.from(`link_${interaction.id}`, "utf-8").toBase64())
+        .setCustomId(Buffer.from(`link_${interaction.id}`, "utf-8").toString('base64'))
         .addLabelComponents(
             new LabelBuilder()
             .setLabel(`Token`)
